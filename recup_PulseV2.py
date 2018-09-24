@@ -29,7 +29,7 @@ MM = '07'
 DD = '25'
 file_name = '2016-7-25_20-40-29_P_HOURS'
 date_file = YYYY+'-'+MM+'-'+DD
-table1='Data_'+carte+'/'+date_file+'/'+file_name+'_'+carte
+table1=sys.argv[1]#'Data_'+carte+'/'+date_file+'/'+file_name+'_'+carte
 nblignes = 0
 fd = open(table1, 'r') # 'r' pour reading = mode lecture
 for line in fd:
@@ -59,10 +59,11 @@ def lineread(l):
 
     """
     row = l.split(',')
-    doublePeak = -1
+    ### print len(row),row
+    doublePeak =  -1
+    doubleDPeak = [-1,-1]
     if row[2]!='':CH0 = row[2]+','+row[3]
     else: CH0 = '-1,-1'
-
     if  len(row)==17:#one peak each
         if row[6]=='':ch1=False
         if row[10]=='':ch2=False
@@ -123,6 +124,128 @@ def lineread(l):
         if doublePeak==0:
             line +=" \n"+row[0]+','+CH0+','+CH1+','+CH2+','+extraCH
         return line 
+    elif len(row)==21:
+        # two with two peaks
+        # or one with three
+        if row[18]!='':CH3 = row[18]+','+row[19]
+        else:CH3 = '-1,-1'
+        if row[7]==' ':
+            # two double peaks
+            extraCH_1 = row[4]+','+row[5]
+            if row[8]!='':CH1 = row[8]+','+row[9]
+            else:CH1 = '-1,-1'
+            if row[13]==' ':
+                # CH0, CH1
+                doubleDpeak = [0,1]
+                extraCH_2 = row[10]+','+row[11]
+                if row[14]!='':CH2 = row[14]+','+row[15]
+                else:CH2 = '-1,-1'
+                # line is al possible combinations of coincidences
+                line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+extraCH_1+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+CH0+','+extraCH_2+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+extraCH_1+','+extraCH_2+','+CH2+','+CH3
+            elif row[17]==' ':
+                if row[12]!='':CH2 = row[12]+','+row[13]
+                else:CH2 = '-1,-1'
+                # CH0, CH2
+                extraCH_2 = row[14]+','+row[15]
+                # line is al possible combinations of coincidences
+                line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+extraCH_1+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_2+','+CH3
+                line +=" \n"+ row[0]+','+extraCH_1+','+CH1+','+extraCH_2+','+CH3
+            elif row[15]==' ':
+                if row[12]!='':CH2 = row[12]+','+row[13]
+                else:CH2 = '-1,-1'
+                # CH0, CH3
+                extraCH_2 = row[16]+','+row[17]
+                # line is al possible combinations of coincidences
+                line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+extraCH_1+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+CH0+','+CH1+','+CH2+','+extraCH_2
+                line +=" \n"+ row[0]+','+extraCH_1+','+CH1+','+CH2+','+extraCH_2
+        elif row[5]==' ':
+            # three double peaks
+            # three triple peak
+            if row[6]!='':CH1 = row[6]+','+row[7]
+            else:CH1 = '-1,-1'
+            if row[11]==' ':
+                extraCH_1 = row[8]+','+row[9]
+                if row[6]!='':CH2 = row[6]+','+row[7]
+                else:CH2 = '-1,-1'
+                if row[17]==' ':
+                    # doubles in
+                    # CH1 CH2
+                    extraCH_2 = row[14]+','+row[15]
+                    # line is al possible combinations of coincidences
+                    line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+extraCH_1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+extraCH_1+','+extraCH_2+','+CH3
+                if row[15]==' ':
+                    # doubles in
+                    # CH1 CH3
+                    extraCH_2 = row[16]+','+row[17]
+                    # line is al possible combinations of coincidences
+                    line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+extraCH_1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+CH2+','+extraCH_2
+                    line +=" \n"+ row[0]+','+CH0+','+extraCH_1+','+CH2+','+extraCH_2
+            elif row[9]==' ':
+                if row[10]!='':CH2 = row[10]+','+row[11]
+                else:CH2 = '-1,-1'
+                if row[15]==' ':
+                    # doubles in
+                    # CH2 CH3
+                    extraCH_1 = row[12]+','+row[13]
+                    extraCH_2 = row[16]+','+row[17]
+                    # line is al possible combinations of coincidences
+                    line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_1+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+CH2+','+extraCH_2
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_1+','+extraCH_2
+                # now Triples
+                elif row[17]==' ':
+                    # triple in CH2
+                    extraCH_1 = row[12]+','+row[13]
+                    extraCH_2 = row[14]+','+row[15]
+                    # line is al possible combinations of coincidences
+                    line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_1+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+extraCH_2+','+CH3
+                elif row[13]==' ':
+                    # triple in CH3
+                    extraCH_1 = row[16]+','+row[17]
+                    extraCH_2 = row[14]+','+row[15]
+                    # line is al possible combinations of coincidences
+                    line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+CH2+','+extraCH_1
+                    line +=" \n"+ row[0]+','+CH0+','+CH1+','+CH2+','+extraCH_2
+            elif row[13]==' ':
+                if row[14]!='':CH2 = row[14]+','+row[15]
+                else:CH2 = '-1,-1'
+                # triple in CH1
+                extraCH_1 = row[8]+','+row[9]
+                extraCH_2 = row[10]+','+row[11]
+                # line is al possible combinations of coincidences
+                line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+CH0+','+extraCH_1+','+CH2+','+CH3
+                line +=" \n"+ row[0]+','+CH0+','+extraCH_2+','+CH2+','+CH3
+        elif row[9]==' ':
+            # triple in CH0
+            if row[10]!='':CH1 = row[10]+','+row[11]
+            else:CH1 = '-1,-1'
+            if row[14]!='':CH2 = row[14]+','+row[15]
+            else:CH2 = '-1,-1'
+            extraCH_1 = row[4]+','+row[5]
+            extraCH_2 = row[6]+','+row[7]
+            # line is al possible combinations of coincidences
+            line = row[0]+','+CH0+','+CH1+','+CH2+','+CH3
+            line += " \n"+ row[0]+','+extraCH_1+','+CH1+','+CH2+','+CH3
+            line += " \n"+ row[0]+','+extraCH_2+','+CH1+','+CH2+','+CH3
+            #print len(row),row
+        return line
     else:return 0
 
 
@@ -155,7 +278,6 @@ for l in bylines:
     if line!=0:
         output_file.write(line+' \n')
 output_file.close()    
-
 ###################################################
 end = time.time()                                 #
 print "temp de nettoyage = {0:.2f} s".format(end-now)     #
